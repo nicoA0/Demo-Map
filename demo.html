@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Interactive Google Map</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMA8GGtgqdBgEdZ8Ub692KJ3svK0ZVUz0&callback=initMap" async defer></script>
+    <script>
+      let map;
+      let markers = [];
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 4,
+          center: { lat: 39.8283, lng: -98.5795 }, // Center of USA
+          mapTypeId: "roadmap",
+        });
+
+        // Add Map Type Selector
+        document.getElementById("mapType").addEventListener("change", (event) => {
+          map.setMapTypeId(event.target.value);
+        });
+
+        // Click to Add Marker
+        map.addListener("click", (event) => {
+          addMarker(event.latLng);
+        });
+
+        // Jump to a Random Location
+        document.getElementById("randomLocation").addEventListener("click", () => {
+          const randomLat = (Math.random() * 160 - 80).toFixed(4);
+          const randomLng = (Math.random() * 360 - 180).toFixed(4);
+          const randomLocation = new google.maps.LatLng(parseFloat(randomLat), parseFloat(randomLng));
+          map.setCenter(randomLocation);
+          map.setZoom(8);
+          addMarker(randomLocation);
+        });
+      }
+
+      function addMarker(location) {
+        const marker = new google.maps.Marker({
+          position: location,
+          map: map,
+          draggable: true,
+          animation: google.maps.Animation.DROP,
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<p>Latitude: ${location.lat().toFixed(4)}, Longitude: ${location.lng().toFixed(4)}</p>
+                    <p><b>Drag me!</b> (Double-click to remove)</p>`,
+        });
+
+        marker.addListener("click", () => {
+          infoWindow.open(map, marker);
+        });
+
+        marker.addListener("dragend", () => {
+          const newPos = marker.getPosition();
+          infoWindow.setContent(`<p>Latitude: ${newPos.lat().toFixed(4)}, Longitude: ${newPos.lng().toFixed(4)}</p>`);
+        });
+
+        marker.addListener("dblclick", () => {
+          marker.setMap(null);
+        });
+
+        markers.push(marker);
+        map.setZoom(10); // Auto-zoom in on new marker
+        map.setCenter(location);
+      }
+    </script>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+      #controls {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        z-index: 5;
+        display: flex;
+        gap: 10px;
+      }
+      select, button {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button {
+        background: #4285F4;
+        color: white;
+        border: none;
+      }
+      button:hover {
+        background: #357ae8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <select id="mapType">
+        <option value="roadmap">Roadmap</option>
+        <option value="satellite">Satellite</option>
+        <option value="hybrid">Hybrid</option>
+        <option value="terrain">Terrain</option>
+      </select>
+      <button id="randomLocation">🎲 Random Location</button>
+    </div>
+    <div id="map"></div>
+  </body>
+</html>
