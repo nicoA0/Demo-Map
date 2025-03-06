@@ -19,9 +19,12 @@
           map.setMapTypeId(event.target.value);
         });
 
-        // Click to Add Marker
+        // Click to Add Named Marker
         map.addListener("click", (event) => {
-          addMarker(event.latLng);
+          const markerName = prompt("Enter a name for this marker:");
+          if (markerName) {
+            addMarker(event.latLng, markerName);
+          }
         });
 
         // Jump to a Random Location
@@ -29,13 +32,14 @@
           const randomLat = (Math.random() * 160 - 80).toFixed(4);
           const randomLng = (Math.random() * 360 - 180).toFixed(4);
           const randomLocation = new google.maps.LatLng(parseFloat(randomLat), parseFloat(randomLng));
+          const markerName = `Random Location (${randomLat}, ${randomLng})`;
           map.setCenter(randomLocation);
           map.setZoom(8);
-          addMarker(randomLocation);
+          addMarker(randomLocation, markerName);
         });
       }
 
-      function addMarker(location) {
+      function addMarker(location, name) {
         const marker = new google.maps.Marker({
           position: location,
           map: map,
@@ -44,7 +48,8 @@
         });
 
         const infoWindow = new google.maps.InfoWindow({
-          content: `<p>Latitude: ${location.lat().toFixed(4)}, Longitude: ${location.lng().toFixed(4)}</p>
+          content: `<p><b>${name}</b></p>
+                    <p>Latitude: ${location.lat().toFixed(4)}, Longitude: ${location.lng().toFixed(4)}</p>
                     <p><b>Drag me!</b> (Double-click to remove)</p>`,
         });
 
@@ -54,7 +59,8 @@
 
         marker.addListener("dragend", () => {
           const newPos = marker.getPosition();
-          infoWindow.setContent(`<p>Latitude: ${newPos.lat().toFixed(4)}, Longitude: ${newPos.lng().toFixed(4)}</p>`);
+          infoWindow.setContent(`<p><b>${name}</b></p>
+                                <p>Latitude: ${newPos.lat().toFixed(4)}, Longitude: ${newPos.lng().toFixed(4)}</p>`);
         });
 
         marker.addListener("dblclick", () => {
@@ -62,8 +68,6 @@
         });
 
         markers.push(marker);
-        map.setZoom(10); // Auto-zoom in on new marker
-        map.setCenter(location);
       }
     </script>
     <style>
