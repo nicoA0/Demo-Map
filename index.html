@@ -49,7 +49,7 @@
 
         // InfoWindow for displaying the name above the marker
         const infoWindow = new google.maps.InfoWindow({
-          content: `<p><b>${name}</b></p>`,
+          content: `<p><b>${name}</b></p>`, // Only show the name
         });
 
         marker.addListener("click", () => {
@@ -58,8 +58,7 @@
 
         marker.addListener("dragend", () => {
           const newPos = marker.getPosition();
-          infoWindow.setContent(`<p><b>${name}</b></p>
-                                <p>Latitude: ${newPos.lat().toFixed(4)}, Longitude: ${newPos.lng().toFixed(4)}</p>`);
+          infoWindow.setContent(`<p><b>${name}</b></p>`); // Update content without lat/lng
         });
 
         marker.addListener("dblclick", () => {
