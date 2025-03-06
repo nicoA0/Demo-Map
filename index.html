@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Interactive Google Map</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMA8GGtgqdBgEdZ8Ub692KJ3svK0ZVUz0&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
     <script>
       let map;
       let markers = [];
@@ -21,7 +21,7 @@
 
         // Click to Add Named Marker
         map.addListener("click", (event) => {
-          const markerName = prompt("Enter a name for this marker:");
+          const markerName = prompt("Enter a name for this marker:"); // Ask user for a name
           if (markerName) {
             addMarker(event.latLng, markerName);
           }
