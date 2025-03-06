@@ -45,13 +45,31 @@
           map: map,
           draggable: true,
           animation: google.maps.Animation.DROP,
-          label: {
-            text: name,
-            color: "black", // Label text color
-            fontSize: "14px", // Label font size
-            fontWeight: "bold" // Label font weight
-          }
         });
+
+        // Create custom label for the marker
+        const labelDiv = document.createElement("div");
+        labelDiv.style.position = "absolute";
+        labelDiv.style.top = "-25px";  // Position above the marker
+        labelDiv.style.left = "-25px"; // Center the label horizontally
+        labelDiv.style.fontSize = "14px";
+        labelDiv.style.fontWeight = "bold";
+        labelDiv.style.color = "black";
+        labelDiv.style.backgroundColor = "white";
+        labelDiv.style.padding = "2px 5px";
+        labelDiv.style.borderRadius = "3px";
+        labelDiv.innerHTML = name;
+
+        const labelOverlay = new google.maps.OverlayView();
+        labelOverlay.draw = function () {
+          const projection = this.getProjection();
+          const position = projection.fromLatLngToDivPixel(marker.getPosition());
+          labelDiv.style.left = position.x + "px";
+          labelDiv.style.top = position.y - 25 + "px"; // Position label above the marker
+        };
+
+        labelOverlay.setMap(map);
+        labelOverlay.getPanes().overlayLayer.appendChild(labelDiv);
 
         const infoWindow = new google.maps.InfoWindow({
           content: `<p><b>${name}</b></p>
@@ -65,12 +83,14 @@
 
         marker.addListener("dragend", () => {
           const newPos = marker.getPosition();
+          labelOverlay.draw(); // Update the label position
           infoWindow.setContent(`<p><b>${name}</b></p>
                                 <p>Latitude: ${newPos.lat().toFixed(4)}, Longitude: ${newPos.lng().toFixed(4)}</p>`);
         });
 
         marker.addListener("dblclick", () => {
           marker.setMap(null);
+          labelOverlay.setMap(null); // Remove the label when marker is removed
         });
 
         markers.push(marker);
